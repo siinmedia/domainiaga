@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Domain Marketplace</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1976d2',
+            secondary: '#e3f2fd',
+            dark: '#1a202c',
+            gray: {
+              50: '#f9fafb',
+              100: '#f3f4f6',
+              200: '#e5e7eb',
+              300: '#d1d5db',
+              400: '#9ca3af',
+              500: '#6b7280',
+              600: '#4b5563',
+              700: '#374151',
+              800: '#1f2937',
+              900: '#111827'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .domain-card {
+      transition: all 0.3s ease;
+      border: 1px solid #e5e7eb;
+    }
+    
+    .domain-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      border-color: #1976d2;
+    }
+    
+    .badge-terjual {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      transform: rotate(45deg);
+      position: absolute;
+      right: -30px;
+      top: 20px;
+      width: 100px;
+      text-align: center;
+      padding: 4px 0;
+      font-size: 12px;
+      font-weight: bold;
+      color: white;
+      z-index: 10;
+    }
+    
+    .search-container {
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .metric-item {
+      font-size: 11px;
+      color: #6b7280;
+    }
+    
+    .metric-value {
+      font-weight: 500;
+      color: #374151;
+    }
+    
+    .smooth-transition {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #1976d2;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #1565c0;
+    }
+    
+    @media (max-width: 768px) {
+      .modal-content {
+        flex-direction: column;
+      }
+      .qr-section {
+        margin-right: 0;
+        margin-bottom: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+            <i class="fas fa-globe text-white text-xl"></i>
+          </div>
+          <span class="text-xl font-bold text-gray-900">DomainLuxe</span>
+        </div>
+        
+        <nav class="hidden md:flex space-x-8">
+          <a href="#" class="text-gray-700 hover:text-primary smooth-transition">Marketplace</a>
+          <a href="#" class="text-gray-700 hover:text-primary smooth-transition">Harga</a>
+          <a href="#" class="text-gray-700 hover:text-primary smooth-transition">Tentang</a>
+          <a href="#" class="text-gray-700 hover:text-primary smooth-transition">Kontak</a>
+        </nav>
+        
+        <button class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg smooth-transition font-medium">
+          Masuk
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Search Section -->
+    <div class="mb-8">
+      <div class="search-container">
+        <div class="relative">
+          <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <input 
+            type="text" 
+            placeholder="Cari domain disini" 
+            class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Domain Terbaru Section -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-4 border-primary inline-block">Domain Terbaru</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="domainList">
+        <!-- Domains will be rendered here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- QRIS Modal -->
+  <div id="qrisModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black bg-opacity-50 overflow-y-auto">
+    <div class="bg-white rounded-2xl w-full max-w-2xl overflow-hidden">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 id="modalTitle" class="text-xl font-bold text-gray-900">Pembayaran Domain</h2>
+          <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 smooth-transition">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+        
+        <div class="flex flex-col md:flex-row modal-content">
+          <!-- QR Section (Left) -->
+          <div class="qr-section flex flex-col items-center md:items-start md:mr-6">
+            <div class="bg-blue-50 rounded-lg p-4 mb-4 w-full text-center">
+              <p class="text-2xl font-bold text-primary" id="nominalDisplay">Rp 0</p>
+            </div>
+            
+            <div class="mb-4">
+              <canvas id="qrisCanvas" class="border border-gray-200 rounded-lg bg-white p-3 w-48 h-48"></canvas>
+            </div>
+            
+            <button onclick="downloadQR()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium smooth-transition">
+              <i class="fas fa-download mr-2"></i>Download QR
+            </button>
+          </div>
+          
+          <!-- Info Section (Right) -->
+          <div class="flex-1">
+            <div class="bg-gray-50 rounded-lg p-4 mb-4" id="domainInfo">
+              <!-- Domain info will be populated here -->
+            </div>
+
+            
+            <button onclick="confirmPayment()" class="w-full bg-primary hover:bg-blue-700 text-white py-3 rounded-lg font-medium smooth-transition">
+              Saya Sudah Bayar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <input type="hidden" id="qrisBase" value="00020101021126610014COM.GO-JEK.WWW01189360091432840999140210G2840999140303UMI51440014ID.CO.QRIS.WWW0215ID10253780771980303UMI5204549953033605802ID5916SIINMEDIA, PCNGN6006JEPARA61055946262070703A01630456FE">
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    const domains = [
+      {
+        name: "stihriau",
+        ext: ".ac.id",
+        price: 1500000,
+        da: 6,
+        pa: 26,
+        ss: 3,
+        dr: 7,
+        bl: "166K",
+        registered: "2025-08-06",
+        expired: "2026-08-06",
+        registrar: "Exabytes.co.id",
+        isSold: false
+      },
+      {
+        name: "sidlab",
+        ext: ".id",
+        price: 2100000,
+        da: 15,
+        pa: 31,
+        ss: 3,
+        dr: 14,
+        bl: "2.8M",
+        registered: "2025-08-07",
+        expired: "2026-08-07",
+        registrar: "Exabytes.co.id",
+        isSold: false
+      },
+      {
+        name: "bprmuliatama",
+        ext: ".co.id",
+        price: 2100000,
+        da: 22,
+        pa: 32,
+        ss: 3,
+        dr: 14,
+        bl: "48M",
+        registered: "2025-08-05",
+        expired: "2026-08-05",
+        registrar: "Niagahoster",
+        isSold: true
+      },
+      {
+        name: "qareer",
+        ext: ".id",
+        price: 2600000,
+        da: 56,
+        pa: 43,
+        ss: 3,
+        dr: 17,
+        bl: "6.5K",
+        registered: "2025-08-03",
+        expired: "2026-08-03",
+        registrar: "Domainesia",
+        isSold: false
+      },
+      {
+        name: "alislah",
+        ext: ".id",
+        price: 2100000,
+        da: 16,
+        pa: 27,
+        ss: 1,
+        dr: 14,
+        bl: "3.8M",
+        registered: "2025-08-02",
+        expired: "2026-08-02",
+        registrar: "Rumahweb",
+        isSold: false
+      },
+      {
+        name: "stkipyasika",
+        ext: ".ac.id",
+        price: 1800000,
+        da: 15,
+        pa: 25,
+        ss: 1,
+        dr: 3.6,
+        bl: "137",
+        registered: "2025-08-01",
+        expired: "2026-08-01",
+        registrar: "GoDaddy",
+        isSold: false
+      }
+    ];
+
+    function pad(number) {
+      return number < 10 ? '0' + number : number.toString();
+    }
+
+    function toCRC16(input) {
+      let crc = 0xFFFF;
+      for (let i = 0; i < input.length; i++) {
+        crc ^= input.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) {
+          crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
+        }
+      }
+      let hex = (crc & 0xFFFF).toString(16).toUpperCase();
+      return hex.length === 3 ? "0" + hex : hex;
+    }
+
+    function makeString(qris, { nominal } = {}) {
+      let qrisModified = qris.slice(0, -4).replace("010211", "010212");
+      let qrisParts = qrisModified.split("5802ID");
+
+      let amount = "54" + pad(nominal.toString().length) + nominal;
+      amount += "5802ID";
+
+      let output = qrisParts[0].trim() + amount + qrisParts[1].trim();
+      output += toCRC16(output);
+
+      return output;
+    }
+
+    function showQR(domain) {
+      if (domain.isSold) {
+        Swal.fire({
+          title: 'Domain Terjual',
+          text: 'Maaf, domain ini sudah terjual.',
+          icon: 'info',
+          confirmButtonColor: '#1976d2',
+          confirmButtonText: 'Tutup'
+        });
+        return;
+      }
+
+      const modal = document.getElementById('qrisModal');
+      const canvas = document.getElementById('qrisCanvas');
+      const base = document.getElementById('qrisBase').value.trim();
+      const qrisString = makeString(base, { nominal: domain.price });
+
+      document.getElementById('modalTitle').innerText = `Pembayaran: ${domain.name}${domain.ext}`;
+      document.getElementById('nominalDisplay').innerText = `Rp ${domain.price.toLocaleString('id-ID')}`;
+
+      const domainInfo = document.getElementById('domainInfo');
+      domainInfo.innerHTML = `
+        <h3 class="font-semibold text-lg mb-3 text-gray-900">Detail Domain</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          <div class="bg-white p-3 rounded-lg">
+            <p class="text-gray-500 mb-1">Nama Domain</p>
+            <p class="font-medium text-gray-900">${domain.name}${domain.ext}</p>
+          </div>
+          <div class="bg-white p-3 rounded-lg">
+            <p class="text-gray-500 mb-1">Registrar</p>
+            <p class="font-medium text-gray-900">${domain.registrar}</p>
+          </div>
+          <div class="bg-white p-3 rounded-lg">
+            <p class="text-gray-500 mb-1">Tanggal Pendaftaran</p>
+            <p class="font-medium text-gray-900">${domain.registered}</p>
+          </div>
+          <div class="bg-white p-3 rounded-lg">
+            <p class="text-gray-500 mb-1">Tanggal Kadaluarsa</p>
+            <p class="font-medium text-gray-900">${domain.expired}</p>
+          </div>
+          <div class="bg-white p-3 rounded-lg col-span-1 sm:col-span-2">
+            <p class="text-gray-500 mb-1">Status</p>
+            <p class="font-medium text-green-600">Tersedia untuk pembelian</p>
+          </div>
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      QRCode.toCanvas(canvas, qrisString, {
+        margin: 1,
+        width: 200,
+        color: {
+          dark: '#1976d2',
+          light: '#ffffff'
+        }
+      });
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('qrisModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function confirmPayment() {
+      Swal.fire({
+        title: 'Konfirmasi Pembayaran',
+        html: 'Terima kasih telah melakukan pembayaran. Untuk mempercepat proses verifikasi, silakan kirim bukti transfer ke:<br><br><div class="bg-gray-100 p-3 rounded-lg"><i class="fas fa-whatsapp text-green-500 mr-2"></i> <strong>WhatsApp:</strong> <a href="https://wa.me/6281234567890" class="text-primary">+62 812-3456-7890</a></div><br>Kami akan memproses domain Anda dalam 1x24 jam setelah pembayaran terverifikasi.',
+        icon: 'info',
+        confirmButtonColor: '#1976d2',
+        confirmButtonText: 'Mengerti'
+      });
+    }
+
+    function downloadQR() {
+      const canvas = document.getElementById('qrisCanvas');
+      const link = document.createElement('a');
+      link.download = `QRIS-${document.getElementById('modalTitle').innerText.replace('Pembayaran: ', '')}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+
+      Swal.fire({
+        title: 'QR Code Tersimpan',
+        text: 'QR code telah berhasil diunduh ke perangkat Anda.',
+        icon: 'success',
+        confirmButtonColor: '#1976d2',
+        confirmButtonText: 'Tutup'
+      });
+    }
+
+    function renderDomains() {
+      const list = document.getElementById('domainList');
+      domains.forEach(domain => {
+        const card = document.createElement('div');
+        card.className = 'domain-card bg-white rounded-lg p-5 relative overflow-hidden smooth-transition';
+
+        const soldBadge = domain.isSold ? '<div class="badge-terjual">Terjual</div>' : '';
+
+        card.innerHTML = `
+          ${soldBadge}
+          <div class="mb-4">
+            <h3 class="text-xl font-bold text-gray-900">
+              ${domain.name}<span class="text-primary">${domain.ext}</span>
+            </h3>
+          </div>
+          
+          <div class="grid grid-cols-5 gap-2 mb-4 text-center">
+            <div>
+              <div class="metric-item">DA: <span class="metric-value">${domain.da}</span></div>
+            </div>
+            <div>
+              <div class="metric-item">PA: <span class="metric-value">${domain.pa}</span></div>
+            </div>
+            <div>
+              <div class="metric-item">SS: <span class="metric-value">${domain.ss}</span></div>
+            </div>
+            <div>
+              <div class="metric-item">DR: <span class="metric-value">${domain.dr}</span></div>
+            </div>
+            <div>
+              <div class="metric-item">BL: <span class="metric-value">${domain.bl}</span></div>
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 rounded p-3 mb-4">
+            <div class="text-sm text-gray-500 mb-1">Harga</div>
+            <div class="text-2xl font-bold text-primary">Rp ${domain.price.toLocaleString('id-ID')}</div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2 text-xs text-gray-500 mb-4">
+            <div>
+              <span class="text-gray-400">Terdaftar pada</span>
+              <div class="font-medium text-gray-700">${domain.registered}</div>
+            </div>
+            <div>
+              <span class="text-gray-400">Kedaluwarsa pada</span>
+              <div class="font-medium text-gray-700">${domain.expired}</div>
+            </div>
+          </div>
+          
+          <div class="flex space-x-2">
+            <button onclick='showQR(${JSON.stringify(domain)})'
+                class="flex-1 bg-primary hover:bg-blue-700 text-white py-2 px-3 rounded text-sm font-medium smooth-transition ${domain.isSold ? 'opacity-50 cursor-not-allowed' : ''}">
+               <i class="fas fa-shopping-cart mr-1"></i> Beli Sekarang
+            </button>
+            <button class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-3 rounded text-sm font-medium smooth-transition">
+               <i class="fas fa-globe mr-1"></i> Index
+            </button>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      renderDomains();
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('qrisModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -4,7 +4,7 @@ export interface Domain {
   extension: string
   full_domain: string
   price: number
-  category_id?: string
+  category_id: string | undefined
   registrar: string
   registered_date: string
   expiry_date: string

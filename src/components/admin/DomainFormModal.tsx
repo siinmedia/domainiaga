@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { X, Upload, Save } from 'lucide-react'
+import { X, Save } from 'lucide-react'
 import { supabase, Domain, DomainCategory } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import LoadingSpinner from '../ui/LoadingSpinner'

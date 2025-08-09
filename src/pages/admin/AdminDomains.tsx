@@ -3,14 +3,11 @@ import { useParams, Link } from 'react-router-dom'
 import { 
   Plus, 
   Search, 
-  Filter, 
   Edit, 
   Trash2, 
   Eye,
   Star,
-  TrendingUp,
-  Calendar,
-  DollarSign
+  TrendingUp
 } from 'lucide-react'
 import { supabase, Domain } from '../../lib/supabase'
 import { formatCurrency, formatDateShort } from '../../lib/utils'

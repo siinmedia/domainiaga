@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Globe, TrendingUp, Shield, Clock, Star } from 'lucide-react'
+import { Globe, TrendingUp, Shield, Clock, Star } from 'lucide-react'
 import Header from '../../components/Layout/Header'
 import Footer from '../../components/Layout/Footer'
 import DomainCard from '../../components/domain/DomainCard'

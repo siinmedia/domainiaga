@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Calendar, Eye, TrendingUp, Shield } from 'lucide-react'
+import { Eye } from 'lucide-react'
 import { Domain } from '../../lib/supabase'
 import { formatCurrency, formatDateShort, getDaysUntilExpiry } from '../../lib/utils'
 

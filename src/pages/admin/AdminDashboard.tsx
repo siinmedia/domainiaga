@@ -5,7 +5,6 @@ import {
   TrendingUp, 
   Clock, 
   Eye,
-  ShoppingCart,
   AlertTriangle,
   CheckCircle
 } from 'lucide-react'
